@@ -10,9 +10,9 @@ import (
 )
 
 func main() {
-
-	// t := http.DefaultTransport.(*http.Transport).Clone()
-	// t.DisableKeepAlives = true
+	//t := http.DefaultTransport.(*http.Transport).Clone()
+	//t.DisableKeepAlives = true
+	//t.IdleConnTimeout = time.Millisecond * 100
 	// c := &http.Client{
 	// 	Transport: t,
 	// }
