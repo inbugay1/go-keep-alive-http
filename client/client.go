@@ -10,17 +10,21 @@ import (
 )
 
 func main() {
-	//t := http.DefaultTransport.(*http.Transport).Clone()
-	//t.DisableKeepAlives = true
-	//t.IdleConnTimeout = time.Millisecond * 100
-	// c := &http.Client{
-	// 	Transport: t,
-	// }
+	t := http.DefaultTransport.(*http.Transport).Clone()
+	//t.DisableKeepAlives = true // no EOF with this
+	//t.IdleConnTimeout = time.Millisecond * 100 // or no EOF with this
+	c := &http.Client{
+		Transport: t,
+	}
 
 	for i := 0; i < 100; i++ {
-		//res, err := c.Post("http://localhost:8090/hello", "text/json", bytes.NewReader(nil))
-		res, err := http.Post("http://localhost:8090/hello", "text/json", bytes.NewReader(nil))
-		//res, err := http.Get(url)
+		req, _ := http.NewRequest(http.MethodPost, "http://localhost:8090/hello", bytes.NewReader(nil))
+		//req.Header.Set("X-Idempotency-Key", "true") // no EOF
+
+		req.Close = true // no EOF
+		res, err := c.Do(req)
+
+		//res, err := c.Get("http://localhost:8090/hello") // no EOF (GET is idempotent)
 
 		if err != nil {
 			log.Printf("error sending: %s", err)
@@ -35,6 +39,6 @@ func main() {
 
 		fmt.Printf("iteration #%0d read: %s", i, string(body))
 
-		time.Sleep(time.Millisecond * 200)
+		time.Sleep(time.Millisecond * 200) // to cause EOF
 	}
 }
